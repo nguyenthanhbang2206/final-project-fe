@@ -12,13 +12,14 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
 
 function UserPhotos() {
   const { userId } = useParams();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [newComments, setNewComments] = useState({}); // photoId -> commentText
@@ -26,7 +27,7 @@ function UserPhotos() {
   const fetchData = async () => {
     const [userData, photosData] = await Promise.all([
       fetchModel(`http://localhost:8081/api/user/${userId}`),
-      fetchModel(`http://localhost:8081/api/photosOfUser/${userId}`),
+      fetchModel(`http://localhost:8081/api/photo/photosOfUser/${userId}`),
     ]);
 
     if (userData) {
@@ -39,7 +40,7 @@ function UserPhotos() {
 
   useEffect(() => {
     fetchData();
-  }, [userId]);
+  }, [userId, location.key]);
 
   const handleCommentChange = (photoId, text) => {
     setNewComments((prev) => ({ ...prev, [photoId]: text }));
@@ -50,14 +51,17 @@ function UserPhotos() {
     if (!text) return;
 
     try {
-      const response = await fetch(`http://localhost:8081/api/photo/commentsOfPhoto/${photoId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const response = await fetch(
+        `http://localhost:8081/api/photo/commentsOfPhoto/${photoId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ comment: text }),
         },
-        body: JSON.stringify({ comment: text }),
-      });
+      );
 
       if (response.ok) {
         setNewComments((prev) => ({ ...prev, [photoId]: "" }));

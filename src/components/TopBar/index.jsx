@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Box, Button, Snackbar, Alert } from "@mui/material";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import "./styles.css";
 
 function TopBar({ user, onLogout }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [uploadMessage, setUploadMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
 
   let rightText = "";
   const userMatch = location.pathname.match(/\/users\/([^\/]+)/);
@@ -43,74 +45,96 @@ function TopBar({ user, onLogout }) {
       });
 
       if (response.ok) {
-        setUploadMessage("Photo uploaded successfully!");
-        setTimeout(() => setUploadMessage(""), 3000);
-        // Refresh the page or update state to show new photo
-        window.location.reload();
+        setSeverity("success");
+        setUploadMessage("upload thành công");
+        // Redirect to user's photos page
+        navigate(`/photos/${user._id}`);
       } else {
         const data = await response.json();
+        setSeverity("error");
         setUploadMessage(`Upload failed: ${data.error}`);
       }
     } catch (err) {
+      setSeverity("error");
       setUploadMessage(`Upload error: ${err.message}`);
     }
   };
 
-  return (
-    <AppBar className="topbar-appBar" position="absolute">
-      <Toolbar>
-        <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
-          <Typography variant="h6" color="inherit">
-            Nguyễn Thanh Bằng B23DCCN066
-          </Typography>
-          {uploadMessage && (
-            <Typography variant="body2" sx={{ ml: 2, color: "yellow" }}>
-              {uploadMessage}
-            </Typography>
-          )}
-        </Box>
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setUploadMessage("");
+  };
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          {user ? (
-            <>
-              <Typography variant="subtitle1" color="inherit">
-                Hi {user.first_name}
-              </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="small"
-                onClick={handleUploadButtonClick}
-              >
-                Add Photo
-              </Button>
-              <input
-                type="file"
-                id="photo-upload-input"
-                style={{ display: "none" }}
-                accept="image/*"
-                onChange={handleFileChange}
-              />
-              <Button
-                variant="outlined"
-                color="inherit"
-                size="small"
-                onClick={onLogout}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <Typography variant="subtitle1" color="inherit">
-              Please Login
+  return (
+    <>
+      <AppBar className="topbar-appBar" position="absolute">
+        <Toolbar>
+          <Box sx={{ flex: 1, display: "flex", alignItems: "center" }}>
+            <Typography variant="h6" color="inherit">
+              Nguyễn Thanh Bằng B23DCCN066
             </Typography>
-          )}
-          <Typography variant="subtitle1" color="inherit" sx={{ ml: 2 }}>
-            {rightText}
-          </Typography>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            {user ? (
+              <>
+                <Typography variant="subtitle1" color="inherit">
+                  Hi {user.first_name}
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  onClick={handleUploadButtonClick}
+                >
+                  Add Photo
+                </Button>
+                <input
+                  type="file"
+                  id="photo-upload-input"
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <Button
+                  variant="outlined"
+                  color="inherit"
+                  size="small"
+                  onClick={onLogout}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Typography variant="subtitle1" color="inherit">
+                Please Login
+              </Typography>
+            )}
+            <Typography variant="subtitle1" color="inherit" sx={{ ml: 2 }}>
+              {rightText}
+            </Typography>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <Snackbar
+        open={!!uploadMessage}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={severity}
+          variant="filled"
+          sx={{ width: "100%", boxShadow: 3 }}
+        >
+          {uploadMessage}
+        </Alert>
+      </Snackbar>
+    </>
   );
 }
 
