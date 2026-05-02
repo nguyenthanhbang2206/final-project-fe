@@ -9,38 +9,67 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  TextField,
+  Button,
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
 
-/**
- * Define UserPhotos, a React component of Project 4.
- */
 function UserPhotos() {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [newComments, setNewComments] = useState({}); // photoId -> commentText
+
+  const fetchData = async () => {
+    const [userData, photosData] = await Promise.all([
+      fetchModel(`http://localhost:8081/api/user/${userId}`),
+      fetchModel(`http://localhost:8081/api/photosOfUser/${userId}`),
+    ]);
+
+    if (userData) {
+      setUser(userData);
+    }
+    if (photosData) {
+      setPhotos(photosData);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      // Fetch user details and photos concurrently
-      const [userData, photosData] = await Promise.all([
-        fetchModel(`http://localhost:8081/api/user/${userId}`),
-        fetchModel(`http://localhost:8081/api/photosOfUser/${userId}`),
-      ]);
-
-      if (userData) {
-        setUser(userData);
-      }
-      if (photosData) {
-        setPhotos(photosData);
-      }
-    };
-
     fetchData();
   }, [userId]);
+
+  const handleCommentChange = (photoId, text) => {
+    setNewComments((prev) => ({ ...prev, [photoId]: text }));
+  };
+
+  const handleAddComment = async (photoId) => {
+    const text = newComments[photoId];
+    if (!text) return;
+
+    try {
+      const response = await fetch(`http://localhost:8081/api/photo/commentsOfPhoto/${photoId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ comment: text }),
+      });
+
+      if (response.ok) {
+        setNewComments((prev) => ({ ...prev, [photoId]: "" }));
+        fetchData(); // Refresh photos to show new comment
+      } else {
+        const data = await response.json();
+        alert(`Error: ${data.error}`);
+      }
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
 
   if (!user) {
     return <Typography variant="body1">User not found.</Typography>;
@@ -65,7 +94,7 @@ function UserPhotos() {
               maxHeight: 400,
               objectFit: "contain",
             }}
-            image={require(`../../images/${photo.file_name}`)}
+            image={`http://localhost:8081/images/${photo.file_name}`}
             alt={photo.file_name}
           />
           <CardContent>
@@ -96,6 +125,23 @@ function UserPhotos() {
                 </React.Fragment>
               ))}
             </List>
+
+            <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Add a comment..."
+                value={newComments[photo._id] || ""}
+                onChange={(e) => handleCommentChange(photo._id, e.target.value)}
+              />
+              <Button
+                variant="contained"
+                onClick={() => handleAddComment(photo._id)}
+                disabled={!newComments[photo._id]}
+              >
+                Post
+              </Button>
+            </Box>
           </CardContent>
         </Card>
       ))}
