@@ -4,6 +4,7 @@ export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [appTitle, setAppTitle] = useState("");
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -23,12 +24,15 @@ export const AppProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setAppTitle("");
     localStorage.removeItem("user");
     localStorage.removeItem("token");
   };
 
   return (
-    <AppContext.Provider value={{ user, setUser, login, logout }}>
+    <AppContext.Provider
+      value={{ user, setUser, login, logout, appTitle, setAppTitle }}
+    >
       {children}
     </AppContext.Provider>
   );

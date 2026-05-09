@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Typography,
   Card,
@@ -16,6 +16,7 @@ import { Link, useParams, useLocation } from "react-router-dom";
 
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
+import { AppContext } from "../../AppContext";
 
 function UserPhotos() {
   const { userId } = useParams();
@@ -23,6 +24,7 @@ function UserPhotos() {
   const [user, setUser] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [newComments, setNewComments] = useState({}); // photoId -> commentText
+  const { setAppTitle } = useContext(AppContext);
 
   const fetchData = async () => {
     const [userData, photosData] = await Promise.all([
@@ -32,6 +34,7 @@ function UserPhotos() {
 
     if (userData) {
       setUser(userData);
+      setAppTitle(`Photos of ${userData.first_name} ${userData.last_name}`);
     }
     if (photosData) {
       setPhotos(photosData);
@@ -40,7 +43,8 @@ function UserPhotos() {
 
   useEffect(() => {
     fetchData();
-  }, [userId, location.key]);
+    return () => setAppTitle("");
+  }, [userId, location.key, setAppTitle]);
 
   const handleCommentChange = (photoId, text) => {
     setNewComments((prev) => ({ ...prev, [photoId]: text }));

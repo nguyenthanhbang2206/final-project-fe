@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Box,
   Button,
@@ -8,8 +8,10 @@ import {
   Alert,
   Divider,
 } from "@mui/material";
+import { AppContext } from "../../AppContext";
 
-function LoginRegister({ onLoginSuccess }) {
+function LoginRegister() {
+  const { login } = useContext(AppContext);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     login_name: "",
@@ -47,7 +49,7 @@ function LoginRegister({ onLoginSuccess }) {
       }
 
       localStorage.setItem("token", data.token);
-      onLoginSuccess(data);
+      login(data);
     } catch (err) {
       setError(err.message);
     }

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Typography, Divider, Box } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 
 import "./styles.css";
 import fetchModel from "../../lib/fetchModelData";
+import { AppContext } from "../../AppContext";
 
 /**
  * Define UserDetail, a React component of Project 4.
@@ -11,16 +12,19 @@ import fetchModel from "../../lib/fetchModelData";
 function UserDetail() {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
+  const { setAppTitle } = useContext(AppContext);
 
   useEffect(() => {
     const fetchUser = async () => {
       const data = await fetchModel(`http://localhost:8081/api/user/${userId}`);
       if (data) {
         setUser(data);
+        setAppTitle(`${data.first_name} ${data.last_name}`);
       }
     };
     fetchUser();
-  }, [userId]);
+    return () => setAppTitle("");
+  }, [userId, setAppTitle]);
 
   if (!user) {
     return <Typography variant="body1">User not found.</Typography>;
@@ -28,20 +32,30 @@ function UserDetail() {
 
   return (
     <Box>
-      <Typography variant="h5">
+      <Typography variant="h5" gutterBottom>
         {user.first_name} {user.last_name}
       </Typography>
-      <Typography variant="subtitle1" color="text.secondary">
-        {user.location}
-      </Typography>
+
       <Divider sx={{ my: 2 }} />
-      <Typography variant="body1">{user.description}</Typography>
-      <Typography variant="body2" sx={{ mt: 1 }}>
-        <strong>Occupation: </strong>
-        {user.occupation}
-      </Typography>
+
+      <Box sx={{ display: "grid", gap: 1 }}>
+        <Typography variant="body1">
+          <strong>Location: </strong>
+          {user.location || "-"}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Description: </strong>
+          {user.description || "-"}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Occupation: </strong>
+          {user.occupation || "-"}
+        </Typography>
+      </Box>
+
       <Divider sx={{ my: 2 }} />
-      <Typography>
+
+      <Typography variant="body2">
         <Link to={`/photos/${user._id}`}>View photos of {user.first_name}</Link>
       </Typography>
     </Box>

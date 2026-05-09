@@ -1,26 +1,25 @@
 import { useContext, useState } from "react";
-import { AppBar, Toolbar, Typography, Box, Button, Snackbar, Alert } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { AppContext } from "../../AppContext";
 
 import "./styles.css";
 
 function TopBar() {
-  const { user, logout: onLogout } = useContext(AppContext);
-  const location = useLocation();
+  const { user, appTitle, logout } = useContext(AppContext);
   const navigate = useNavigate();
   const [uploadMessage, setUploadMessage] = useState("");
   const [severity, setSeverity] = useState("success");
 
-  let rightText = "";
-  const userMatch = location.pathname.match(/\/users\/([^\/]+)/);
-  const photosMatch = location.pathname.match(/\/photos\/([^\/]+)/);
-
-  if (userMatch) {
-    rightText = "User Details";
-  } else if (photosMatch) {
-    rightText = "User Photos";
-  }
+  const rightText = user ? appTitle : "";
 
   const handleUploadButtonClick = (e) => {
     e.preventDefault();
@@ -104,7 +103,7 @@ function TopBar() {
                   variant="outlined"
                   color="inherit"
                   size="small"
-                  onClick={onLogout}
+                  onClick={logout}
                 >
                   Logout
                 </Button>
@@ -114,9 +113,11 @@ function TopBar() {
                 Please Login
               </Typography>
             )}
-            <Typography variant="subtitle1" color="inherit" sx={{ ml: 2 }}>
-              {rightText}
-            </Typography>
+            {rightText ? (
+              <Typography variant="subtitle1" color="inherit" sx={{ ml: 2 }}>
+                {rightText}
+              </Typography>
+            ) : null}
           </Box>
         </Toolbar>
       </AppBar>
