@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import { AppBar, Toolbar, Typography, Box, Button, Snackbar, Alert } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
+import { AppContext } from "../../AppContext";
 
 import "./styles.css";
 
-function TopBar({ user, onLogout }) {
+function TopBar() {
+  const { user, logout: onLogout } = useContext(AppContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [uploadMessage, setUploadMessage] = useState("");

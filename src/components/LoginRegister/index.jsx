@@ -47,7 +47,6 @@ function LoginRegister({ onLoginSuccess }) {
       }
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
       onLoginSuccess(data);
     } catch (err) {
       setError(err.message);

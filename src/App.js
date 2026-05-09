@@ -1,6 +1,6 @@
 import './App.css';
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Grid, Paper } from "@mui/material";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 
@@ -9,25 +9,14 @@ import UserDetail from "./components/UserDetail";
 import UserList from "./components/UserList";
 import UserPhotos from "./components/UserPhotos";
 import LoginRegister from "./components/LoginRegister";
+import { useContext } from "react";
+import { AppContext } from "./AppContext";
 
 const App = () => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  const handleLoginSuccess = (userData) => {
-    setUser(userData);
-  };
+  const { user, login, logout } = useContext(AppContext);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
+    logout();
   };
 
   return (
@@ -35,8 +24,9 @@ const App = () => {
       <div>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <TopBar user={user} onLogout={handleLogout} />
+            <TopBar />
           </Grid>
+
           <div className="main-topbar-buffer" />
           <Grid item sm={3}>
             <Paper className="main-grid-item">
@@ -58,7 +48,7 @@ const App = () => {
                   <>
                     <Route
                       path="/login-register"
-                      element={<LoginRegister onLoginSuccess={handleLoginSuccess} />}
+                      element={<LoginRegister onLoginSuccess={login} />}
                     />
                     <Route path="*" element={<Navigate to="/login-register" />} />
                   </>
