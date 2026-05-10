@@ -28,8 +28,8 @@ function UserPhotos() {
 
   const fetchData = async () => {
     const [userData, photosData] = await Promise.all([
-      fetchModel(`http://localhost:8081/api/user/${userId}`),
-      fetchModel(`http://localhost:8081/api/photo/photosOfUser/${userId}`),
+      fetchModel(`https://sxsmh7-8081.csb.app/api/user/${userId}`),
+      fetchModel(`https://sxsmh7-8081.csb.app/api/photo/photosOfUser/${userId}`),
     ]);
 
     if (userData) {
@@ -56,7 +56,7 @@ function UserPhotos() {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/photo/commentsOfPhoto/${photoId}`,
+        `https://sxsmh7-8081.csb.app/api/photo/commentsOfPhoto/${photoId}`,
         {
           method: "POST",
           headers: {
@@ -102,7 +102,7 @@ function UserPhotos() {
               maxHeight: 400,
               objectFit: "contain",
             }}
-            image={`http://localhost:8081/images/${photo.file_name}`}
+            image={`https://sxsmh7-8081.csb.app/images/${photo.file_name}`}
             alt={photo.file_name}
           />
           <CardContent>

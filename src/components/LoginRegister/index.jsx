@@ -34,7 +34,7 @@ function LoginRegister() {
     e.preventDefault();
     setError("");
     try {
-      const response = await fetch("http://localhost:8081/api/admin/login", {
+      const response = await fetch("https://sxsmh7-8081.csb.app/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -66,7 +66,7 @@ function LoginRegister() {
     }
 
     try {
-      const response = await fetch("http://localhost:8081/api/user", {
+      const response = await fetch("https://sxsmh7-8081.csb.app/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

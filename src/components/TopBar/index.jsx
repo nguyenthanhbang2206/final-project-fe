@@ -37,7 +37,7 @@ function TopBar() {
     formData.append("photo", file);
 
     try {
-      const response = await fetch("http://localhost:8081/api/photo/new", {
+      const response = await fetch("https://sxsmh7-8081.csb.app/api/photo/new", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
