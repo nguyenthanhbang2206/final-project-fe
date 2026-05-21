@@ -3,7 +3,7 @@
   "setupTasks": [
     {
       "name": "Installing Dependencies",
-      "command": "npm install"
+      "command": "yarn install"
     }
   ],
 
@@ -11,7 +11,7 @@
   "tasks": {
     "start": {
       "name": "start",
-      "command": "npm run start",
+      "command": "yarn start",
       "runAtStart": true,
       "preview": {
         "port": 3000
@@ -19,17 +19,17 @@
     },
     "build": {
       "name": "build",
-      "command": "npm run build",
+      "command": "yarn build",
       "runAtStart": false
     },
     "test": {
       "name": "test",
-      "command": "npm run test",
+      "command": "yarn test",
       "runAtStart": false
     },
     "eject": {
       "name": "eject",
-      "command": "npm run eject",
+      "command": "yarn eject",
       "runAtStart": false
     }
   }
